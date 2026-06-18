@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
+<title>INKA — Dari Agri 🚂</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --sky:#E8F4FD;
+  --sky2:#C9E8F7;
+  --sun:#FFD93D;
+  --sun2:#FFB830;
+  --mint:#B8F0D8;
+  --mint2:#6EDBA8;
+  --peach:#FFD4C2;
+  --peach2:#FF9E7D;
+  --lav:#DDD6FE;
+  --lav2:#A78BFA;
+  --red:#FF4B6E;
+  --red2:#FF1744;
+  --ink:#2D2A26;
+  --ink-soft:#6B6560;
+  --ink-muted:#A8A29E;
+  --white:#FFFEF9;
+  --card:#FFFEF9;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--sky);color:var(--ink);overflow-x:hidden;line-height:1.6}
+
+/* ===== OVERLAY ===== */
+#overlay{
+  position:fixed;inset:0;z-index:9000;
+  background:linear-gradient(160deg,#FFF9E6 0%,#FFE8D6 35%,#E8D6FF 70%,#D6F0FF 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity 1s ease,visibility 1s ease;overflow:hidden;
+}
+#overlay.gone{opacity:0;visibility:hidden;pointer-events:none}
+
+/* clouds */
+.cloud{position:absolute;border-radius:50px;opacity:.6;animation:floatCloud linear infinite}
+.cloud::before,.cloud::after{content:'';position:absolute;border-radius:50%}
+@keyframes floatCloud{from{transform:translateX(-200px)}to{transform:translateX(110vw)}}
+.c1{width:120px;height:40px;background:#fff;top:12%;animation-duration:18s;animation-delay:-3s}
+.c1::before{width:60px;height:55px;background:#fff;top:-28px;left:20px}
+.c1::after{width:40px;height:40px;background:#fff;top:-20px;left:55px}
+.c2{width:90px;height:30px;background:#fff;top:22%;animation-duration:24s;animation-delay:-10s}
+.c2::before{width:45px;height:42px;background:#fff;top:-22px;left:15px}
+.c2::after{width:30px;height:30px;background:#fff;top:-14px;left:42px}
+.c3{width:150px;height:50px;background:#fff;top:8%;animation-duration:30s;animation-delay:-18s}
+.c3::before{width:70px;height:60px;background:#fff;top:-32px;left:28px}
+.c3::after{width:50px;height:45px;background:#fff;top:-22px;left:72px}
+
+/* sun */
+.sun{position:absolute;top:5%;right:8%;width:80px;height:80px;background:var(--sun);border-radius:50%;box-shadow:0 0 0 14px rgba(255,217,61,.22),0 0 0 28px rgba(255,217,61,.1);animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 14px rgba(255,217,61,.22),0 0 0 28px rgba(255,217,61,.1)}50%{box-shadow:0 0 0 20px rgba(255,217,61,.28),0 0 0 38px rgba(255,217,61,.12)}}
+
+.ov-kicker{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:1rem;font-weight:700;background:rgba(255,255,255,.6);padding:.3rem 1rem;border-radius:99px}
+.ov-logo{font-family:'Playfair Display',serif;font-size:clamp(4rem,13vw,9rem);font-weight:700;font-style:italic;color:var(--ink);line-height:1;text-align:center;position:relative}
+.ov-logo .highlight{color:var(--red);position:relative;display:inline-block}
+.ov-logo .highlight::after{content:'✦';font-size:.3em;position:absolute;top:0;right:-.4em;color:var(--sun2)}
+.ov-tagline{font-size:1rem;font-weight:600;color:var(--ink-soft);margin-top:.5rem;text-align:center}
+
+/* TRACK */
+.ov-track-wrap{width:min(560px,88vw);margin:2.5rem 0 .8rem;position:relative}
+.ov-ground{height:16px;position:relative;margin-bottom:0}
+.ov-rail-top,.ov-rail-bot{position:absolute;left:0;right:0;height:5px;background:#A0917A;border-radius:3px}
+.ov-rail-top{top:0}.ov-rail-bot{bottom:0}
+.ov-ties-row{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 4px}
+.ov-tie{width:6px;height:100%;background:#7A6A54;border-radius:1px;opacity:.8}
+
+/* TRAIN */
+.train{position:absolute;top:-28px;left:0;display:flex;align-items:flex-end;cursor:grab;touch-action:none;user-select:none;z-index:10;transition:filter .2s}
+.train:active{cursor:grabbing;filter:drop-shadow(0 4px 12px rgba(255,75,110,.35))}
+.train-svg{display:block}
+
+/* smoke */
+.smoke{position:absolute;pointer-events:none}
+.puff{position:absolute;border-radius:50%;background:rgba(255,255,255,.8);animation:puffUp ease-out forwards}
+@keyframes puffUp{0%{opacity:.9;transform:scale(.3) translateY(0)}100%{opacity:0;transform:scale(1.8) translateY(-38px)}}
+
+.ov-hint{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-muted);font-weight:700;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ===== MAIN ===== */
+main{max-width:1100px;margin:0 auto;padding:0 2rem}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:2rem 0 1.5rem;border-bottom:3px dashed var(--mint2)}
+.tlogo{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;font-style:italic;color:var(--ink)}
+.tlogo span{color:var(--red)}
+.tmeta{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);font-weight:700;background:var(--mint);padding:.3rem .8rem;border-radius:99px}
+
+/* HERO */
+.hero{padding:4.5rem 0 4rem;position:relative}
+.hero-deco{position:absolute;right:0;top:3rem;font-size:7rem;opacity:.12;pointer-events:none;line-height:1}
+.hero-kicker{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin-bottom:1rem;font-weight:800;display:flex;align-items:center;gap:.6rem}
+.hero-kicker::before{content:'🚂';font-size:1rem;letter-spacing:0}
+.hero-h1{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,7vw,5.5rem);font-weight:700;font-style:italic;line-height:1.1;color:var(--ink);max-width:16ch;margin-bottom:1.5rem}
+.hero-h1 em{color:var(--red);font-style:italic;position:relative}
+.hero-sub{font-size:1rem;font-weight:600;color:var(--ink-soft);max-width:46ch;line-height:1.8;background:rgba(255,255,255,.7);padding:1rem 1.2rem;border-radius:16px;border-left:4px solid var(--peach2)}
+
+/* WAVY DIVIDER */
+.wavy{width:100%;overflow:hidden;line-height:0;margin:1rem 0}
+.wavy svg{display:block;width:100%}
+
+/* SECTION LABEL */
+.slabel{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin-bottom:.8rem;font-weight:800;display:inline-flex;align-items:center;gap:.5rem;background:var(--peach);padding:.3rem .9rem;border-radius:99px}
+
+/* TEAM */
+.team{padding:4rem 0}
+.team-h2{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.8vw,2.8rem);font-weight:700;font-style:italic;color:var(--ink);margin-bottom:2.2rem;line-height:1.2}
+.team-h2 em{color:var(--lav2)}
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
+
+/* CARD */
+.pc{border-radius:20px;overflow:hidden;background:var(--card);border:3px solid transparent;transition:transform .3s,box-shadow .3s;box-shadow:0 4px 20px rgba(0,0,0,.07)}
+.pc:hover{transform:translateY(-6px) rotate(-1deg);box-shadow:0 12px 36px rgba(0,0,0,.12)}
+.pc:nth-child(2):hover{transform:translateY(-6px) rotate(1deg)}
+.pc:nth-child(3):hover{transform:translateY(-6px) rotate(-1deg)}
+.pc:nth-child(4):hover{transform:translateY(-6px) rotate(1deg)}
+.pc.her{border-color:var(--sun2);box-shadow:0 4px 20px rgba(255,184,48,.25)}
+.pc.her:hover{box-shadow:0 12px 36px rgba(255,184,48,.35);transform:translateY(-6px) rotate(-1deg)}
+.her-tag{position:absolute;top:.65rem;right:.65rem;z-index:5;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;background:var(--sun);color:var(--ink);padding:.25rem .7rem;border-radius:99px;font-weight:800}
+
+.pc-photo{width:100%;aspect-ratio:3/4;background:var(--sky);position:relative;overflow:hidden;cursor:pointer}
+.pc-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.pc-photo:hover img{transform:scale(1.05)}
+.pc-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;pointer-events:none}
+.pc-ph .ini{font-family:'Playfair Display',serif;font-size:3rem;font-weight:700;font-style:italic;color:rgba(0,0,0,.12);line-height:1}
+.pc-ph .iname{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted);font-weight:700}
+.pc-ov{position:absolute;inset:0;background:rgba(255,75,110,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;pointer-events:none;border-radius:0}
+.pc-photo:hover .pc-ov{opacity:1}
+.pc-ov span{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#fff;font-weight:800}
+.pc-photo input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:3}
+
+.pc-body{padding:1rem .9rem .9rem}
+.pc-name{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;font-style:italic;color:var(--ink);margin-bottom:.15rem;line-height:1.2}
+.pc.her .pc-name{color:var(--sun2)}
+.pc-role{font-size:.65rem;color:var(--ink-muted);margin-bottom:.6rem;font-weight:700;letter-spacing:.05em}
+.pc-note{font-size:.8rem;font-weight:600;color:var(--ink-soft);border-top:2px dashed var(--sky2);padding-top:.6rem;line-height:1.6}
+
+/* color per card bg */
+.pc:nth-child(1) .pc-photo{background:linear-gradient(135deg,var(--sun) 0%,var(--peach) 100%)}
+.pc:nth-child(2) .pc-photo{background:linear-gradient(135deg,var(--mint) 0%,var(--sky2) 100%)}
+.pc:nth-child(3) .pc-photo{background:linear-gradient(135deg,var(--lav) 0%,var(--mint) 100%)}
+.pc:nth-child(4) .pc-photo{background:linear-gradient(135deg,var(--peach) 0%,var(--lav) 100%)}
+
+/* MSG SECTION */
+.msg-sec{padding:4rem 0;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.msg-h2{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:700;font-style:italic;color:var(--ink);line-height:1.2;margin-bottom:1.5rem}
+.msg-h2 em{color:var(--red)}
+.msg-prose{font-size:.92rem;font-weight:600;color:var(--ink-soft);line-height:1.9}
+.msg-prose p{margin-bottom:1rem}
+.msg-prose p:last-child{margin-bottom:0}
+.msg-from{margin-top:1.8rem;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted);font-weight:800;padding-top:.9rem;border-top:2px dashed var(--mint2)}
+
+.notes{display:flex;flex-direction:column;gap:1rem}
+.note{background:var(--card);border-radius:16px;padding:1.1rem 1.1rem;position:relative;box-shadow:0 3px 14px rgba(0,0,0,.06);border:2px solid transparent}
+.note:nth-child(1){border-color:var(--mint2)}
+.note:nth-child(2){border-color:var(--lav2)}
+.note:nth-child(3){border-color:var(--peach2)}
+.note-tag{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;margin-bottom:.4rem;display:inline-block;padding:.2rem .7rem;border-radius:99px}
+.note:nth-child(1) .note-tag{background:var(--mint);color:var(--ink)}
+.note:nth-child(2) .note-tag{background:var(--lav);color:var(--ink)}
+.note:nth-child(3) .note-tag{background:var(--peach);color:var(--ink)}
+.note-text{font-size:.85rem;font-weight:600;color:var(--ink-soft);line-height:1.7}
+
+/* INTAN SECTION */
+.her-sec{padding:4rem 0;display:grid;grid-template-columns:4fr 7fr;gap:4rem;align-items:start}
+.her-portrait{aspect-ratio:3/4;border:4px solid var(--sun2);border-radius:24px;overflow:hidden;background:linear-gradient(135deg,var(--sun) 0%,var(--peach) 100%);position:relative;cursor:pointer;box-shadow:6px 6px 0 var(--sun2)}
+.her-portrait img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.her-portrait:hover img{transform:scale(1.04)}
+.her-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;pointer-events:none}
+.her-ph .ini{font-family:'Playfair Display',serif;font-size:5rem;font-weight:700;font-style:italic;color:rgba(0,0,0,.1);line-height:1}
+.her-ph .iname{font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.3);font-weight:800}
+.her-pov{position:absolute;inset:0;background:rgba(255,75,110,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;pointer-events:none}
+.her-portrait:hover .her-pov{opacity:1}
+.her-pov span{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:#fff;font-weight:800}
+.her-portrait input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:3}
+.her-namelabel{margin-top:.8rem;font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;font-style:italic;color:var(--sun2);text-align:center}
+
+.her-right .her-badge{display:inline-block;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;font-weight:800;background:var(--sun);color:var(--ink);padding:.3rem .9rem;border-radius:99px;margin-bottom:1.2rem}
+.her-h2{font-family:'Playfair Display',serif;font-size:clamp(1.7rem,3.8vw,2.8rem);font-weight:700;font-style:italic;color:var(--ink);line-height:1.2;margin-bottom:1.4rem;max-width:20ch}
+.her-h2 em{color:var(--sun2)}
+.her-prose{font-size:.92rem;font-weight:600;color:var(--ink-soft);line-height:1.9;margin-bottom:1.4rem}
+.her-prose p{margin-bottom:.85rem}
+.her-prose p:last-child{margin-bottom:0}
+.her-callout{background:linear-gradient(135deg,var(--sun) 0%,var(--peach) 100%);border:3px solid var(--sun2);border-radius:16px;padding:1.1rem 1.2rem}
+.her-callout p{font-size:.88rem;font-weight:700;color:var(--ink);line-height:1.7;font-style:italic}
+
+/* GALLERY */
+.gal{padding:4rem 0 5rem}
+.gal-h2{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:700;font-style:italic;color:var(--ink);margin-bottom:1.8rem;line-height:1.2}
+.gal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem}
+.gs{aspect-ratio:3/4;border-radius:16px;background:var(--sky);border:3px dashed var(--sky2);position:relative;overflow:hidden;cursor:pointer;transition:transform .3s,box-shadow .3s}
+.gs:hover{transform:scale(1.03);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.gs img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s;border-radius:13px}
+.gs:hover img{transform:scale(1.05)}
+.gs-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35rem;pointer-events:none}
+.gs-ph .gn{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;font-style:italic;color:var(--sky2);line-height:1}
+.gs-ph .gt{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted);font-weight:700}
+.gs-ov{position:absolute;inset:0;background:rgba(255,75,110,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;pointer-events:none}
+.gs:hover .gs-ov{opacity:1}
+.gs-ov span{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#fff;font-weight:800}
+.gs-lbl{position:absolute;bottom:0;left:0;right:0;padding:.6rem .6rem .45rem;background:linear-gradient(transparent,rgba(0,0,0,.45));font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.9);font-weight:700}
+.gs input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:3}
+.gs:nth-child(1){background:linear-gradient(135deg,var(--mint) 0%,var(--sky2) 100%);border-color:var(--mint2)}
+.gs:nth-child(2){background:linear-gradient(135deg,var(--peach) 0%,var(--sun) 100%);border-color:var(--peach2)}
+.gs:nth-child(3){background:linear-gradient(135deg,var(--lav) 0%,var(--mint) 100%);border-color:var(--lav2)}
+.gs:nth-child(4){background:linear-gradient(135deg,var(--sky2) 0%,var(--lav) 100%);border-color:var(--sky2)}
+.gs:nth-child(5){background:linear-gradient(135deg,var(--sun) 0%,var(--peach) 100%);border-color:var(--sun2)}
+.gs:nth-child(6){background:linear-gradient(135deg,var(--mint) 0%,var(--lav) 100%);border-color:var(--mint2)}
+.gs:nth-child(7){background:linear-gradient(135deg,var(--peach) 0%,var(--mint) 100%);border-color:var(--peach2)}
+.gs:nth-child(8){background:linear-gradient(135deg,var(--lav) 0%,var(--sun) 100%);border-color:var(--lav2)}
+
+/* CLOSER */
+.closer{padding:4rem 0 3rem;border-top:3px dashed var(--peach2);display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;flex-wrap:wrap}
+.closer-l .cl{font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-muted);font-weight:800;margin-bottom:.4rem}
+.closer-l .ct{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,3.5vw,2.4rem);font-weight:700;font-style:italic;color:var(--ink);line-height:1.2}
+.closer-l .ct em{color:var(--red)}
+.btn{font-family:'Nunito',sans-serif;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--white);background:var(--red);border:none;padding:.85rem 1.8rem;border-radius:99px;cursor:pointer;flex-shrink:0;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 0 var(--red2)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--red2)}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--red2)}
+
+/* FOOTER */
+.fbar{padding:1.2rem 0;border-top:3px dashed var(--mint2);display:flex;align-items:center;justify-content:space-between;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);font-weight:700;flex-wrap:wrap;gap:.7rem}
+.fbar .r{color:var(--red);font-weight:800}
+
+/* MODAL */
+.mbg{position:fixed;inset:0;background:rgba(45,42,38,.55);display:none;align-items:center;justify-content:center;z-index:8000;padding:1.5rem}
+.mbg.open{display:flex}
+.mbox{background:var(--white);max-width:440px;width:100%;border-radius:24px;border:4px solid var(--sun2);padding:2.4rem 2rem;position:relative;animation:mIn .4s cubic-bezier(.34,1.56,.64,1);box-shadow:8px 8px 0 var(--sun2)}
+@keyframes mIn{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:none}}
+.mclose{position:absolute;top:.8rem;right:.8rem;background:var(--peach);border:none;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);cursor:pointer;padding:.3rem .7rem;border-radius:99px;font-weight:800;font-family:'Nunito',sans-serif}
+.mclose:hover{background:var(--red);color:#fff}
+.m-badge{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;font-weight:800;background:var(--sun);color:var(--ink);display:inline-block;padding:.25rem .8rem;border-radius:99px;margin-bottom:.9rem}
+.m-title{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;font-style:italic;color:var(--ink);line-height:1.2;margin-bottom:1.2rem}
+.m-body{font-size:.9rem;font-weight:600;color:var(--ink-soft);line-height:1.9;margin-bottom:1.2rem}
+.m-body p{margin-bottom:.75rem}
+.m-from{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted);font-weight:800;padding-top:.8rem;border-top:2px dashed var(--mint2)}
+
+/* CONFETTI */
+.conf{position:fixed;pointer-events:none;border-radius:2px;z-index:9999;animation:cf linear forwards}
+@keyframes cf{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* FLOATING DECO */
+.deco-train{position:fixed;bottom:1.5rem;right:1.5rem;font-size:2rem;animation:trainBob 2.5s ease-in-out infinite;pointer-events:none;z-index:100;opacity:.6}
+@keyframes trainBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+@media(max-width:880px){
+  .team-grid{grid-template-columns:repeat(2,1fr)}
+  .msg-sec{grid-template-columns:1fr;gap:2.5rem}
+  .her-sec{grid-template-columns:1fr;gap:2rem}
+  .gal-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:520px){
+  main{padding:0 1rem}
+  .team-grid{grid-template-columns:1fr 1fr;gap:.6rem}
+  .gal-grid{grid-template-columns:1fr 1fr;gap:.55rem}
+  .closer{flex-direction:column;align-items:flex-start}
+  .fbar{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- OVERLAY -->
+<div id="overlay">
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="cloud c3"></div>
+  <div class="sun"></div>
+
+  <div class="ov-kicker">🎉 Dari Agri · untuk kalian berempat</div>
+  <div class="ov-logo"><span class="highlight">I</span>NKA</div>
+  <div class="ov-tagline">Selamat udah selesai, ya! 🎊</div>
+
+  <div class="ov-track-wrap" id="ovTrackWrap">
+    <!-- ground / rails -->
+    <div class="ov-ground">
+      <div class="ov-rail-top"></div>
+      <div class="ov-rail-bot"></div>
+      <div class="ov-ties-row" id="ovTies"></div>
+    </div>
+
+    <!-- TRAIN SVG -->
+    <div class="train" id="ovTrain">
+      <!-- smoke container -->
+      <div class="smoke" id="smokeBox" style="left:2px;top:-18px;width:30px;height:30px"></div>
+
+      <svg class="train-svg" width="160" height="56" viewBox="0 0 160 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Wagon 2 (back) -->
+        <rect x="88" y="10" width="68" height="34" rx="6" fill="#A78BFA"/>
+        <rect x="93" y="15" width="16" height="14" rx="3" fill="rgba(255,255,255,.35)"/>
+        <rect x="114" y="15" width="16" height="14" rx="3" fill="rgba(255,255,255,.35)"/>
+        <circle cx="100" cy="49" r="7" fill="#6B6560"/>
+        <circle cx="100" cy="49" r="4" fill="#2D2A26"/>
+        <circle cx="144" cy="49" r="7" fill="#6B6560"/>
+        <circle cx="144" cy="49" r="4" fill="#2D2A26"/>
+        <!-- coupler -->
+        <rect x="84" y="25" width="6" height="4" rx="1" fill="#A0917A"/>
+
+        <!-- Loco body -->
+        <rect x="8" y="6" width="78" height="38" rx="8" fill="#FF4B6E"/>
+        <!-- loco nose / cab -->
+        <path d="M8 14 Q2 14 2 22 L2 38 Q2 44 8 44 L16 44 L16 6 L8 6 Z" fill="#FF1744"/>
+        <!-- loco windows -->
+        <rect x="20" y="12" width="18" height="16" rx="4" fill="rgba(255,255,255,.4)"/>
+        <rect x="44" y="12" width="18" height="16" rx="4" fill="rgba(255,255,255,.4)"/>
+        <!-- chimney -->
+        <rect x="58" y="0" width="10" height="10" rx="3" fill="#2D2A26"/>
+        <rect x="56" y="7" width="14" height="4" rx="2" fill="#2D2A26"/>
+        <!-- loco wheels -->
+        <circle cx="22" cy="49" r="8" fill="#2D2A26"/>
+        <circle cx="22" cy="49" r="4" fill="#6B6560"/>
+        <circle cx="22" cy="49" r="1.5" fill="#A0917A"/>
+        <circle cx="46" cy="49" r="8" fill="#2D2A26"/>
+        <circle cx="46" cy="49" r="4" fill="#6B6560"/>
+        <circle cx="46" cy="49" r="1.5" fill="#A0917A"/>
+        <circle cx="68" cy="49" r="7" fill="#2D2A26"/>
+        <circle cx="68" cy="49" r="3.5" fill="#6B6560"/>
+        <!-- loco stripe -->
+        <rect x="8" y="30" width="78" height="5" rx="0" fill="rgba(255,255,255,.18)"/>
+        <!-- headlight -->
+        <circle cx="4" cy="26" r="3" fill="var(--sun)"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="ov-hint">👆 Geser kereta ke kanan!</div>
+</div>
+
+<!-- FLOATING DECO -->
+<div class="deco-train">🚂</div>
+
+<!-- MAIN -->
+<main id="mainWrap" style="opacity:0;transition:opacity .9s ease">
+
+  <div class="topbar">
+    <div class="tlogo"><span>I</span>NKA</div>
+    <div class="tmeta">🚆 Quality Control · Magang 2024</div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero reveal">
+    <div class="hero-deco">🚂</div>
+    <div class="hero-kicker">Ucapan dari Agri</div>
+    <h1 class="hero-h1">Kalian berempat<br/>akhirnya <em>kelar juga!</em></h1>
+    <p class="hero-sub">Empat bulan, satu divisi, banyak yang dikerjain bareng — dan sekarang udah selesai. Ini kecil-kecilan dari aku buat kalian. 🎉</p>
+  </section>
+
+  <div class="wavy"><svg viewBox="0 0 1200 40" preserveAspectRatio="none" height="40"><path d="M0,20 C150,40 350,0 600,20 C850,40 1050,0 1200,20 L1200,40 L0,40 Z" fill="var(--mint)" opacity=".5"/><path d="M0,25 C200,5 400,45 600,25 C800,5 1000,45 1200,25 L1200,40 L0,40 Z" fill="var(--mint2)" opacity=".3"/></svg></div>
+
+  <!-- TEAM -->
+  <section class="team reveal">
+    <div class="slabel">🧑‍🤝‍🧑 Orangnya</div>
+    <h2 class="team-h2">Empat orang,<br/>satu divisi yang <em>solid.</em></h2>
+    <div class="team-grid">
+
+      <div class="pc her" style="position:relative">
+        <div class="her-tag">Pacarku ⭐</div>
+        <div class="pc-photo" data-idx="0" onclick="up(0)">
+          <div class="pc-ph"><span class="ini">IN</span><span class="iname">Intan</span></div>
+          <div class="pc-ov"><span>Ganti Foto 📸</span></div>
+          <input type="file" accept="image/*" onchange="handleUp(event,0)"/>
+        </div>
+        <div class="pc-body">
+          <div class="pc-name">Intan</div>
+          <div class="pc-role">QC · INKA</div>
+          <div class="pc-note">Yang tiap malem selalu punya cerita. Ada section khusus di bawah! 👇</div>
+        </div>
+      </div>
+
+      <div class="pc">
+        <div class="pc-photo" data-idx="1" onclick="up(1)">
+          <div class="pc-ph"><span class="ini">ZF</span><span class="iname">Zulfa</span></div>
+          <div class="pc-ov"><span>Ganti Foto 📸</span></div>
+          <input type="file" accept="image/*" onchange="handleUp(event,1)"/>
+        </div>
+        <div class="pc-body">
+          <div class="pc-name">Zulfa</div>
+          <div class="pc-role">QC · INKA</div>
+          <div class="pc-note">Yang paling rajin. Dikasih kerjaan, dikerjain — bukan ditunda. 💪</div>
+        </div>
+      </div>
+
+      <div class="pc">
+        <div class="pc-photo" data-idx="2" onclick="up(2)">
+          <div class="pc-ph"><span class="ini">YL</span><span class="iname">Yulia</span></div>
+          <div class="pc-ov"><span>Ganti Foto 📸</span></div>
+          <input type="file" accept="image/*" onchange="handleUp(event,2)"/>
+        </div>
+        <div class="pc-body">
+          <div class="pc-name">Yulia</div>
+          <div class="pc-role">QC · INKA</div>
+          <div class="pc-note">Spesialis ketiduran di sela kerja — tapi kerjanya tetap beres juga. 😴✅</div>
+        </div>
+      </div>
+
+      <div class="pc">
+        <div class="pc-photo" data-idx="3" onclick="up(3)">
+          <div class="pc-ph"><span class="ini">GL</span><span class="iname">Gladi</span></div>
+          <div class="pc-ov"><span>Ganti Foto 📸</span></div>
+          <input type="file" accept="image/*" onchange="handleUp(event,3)"/>
+        </div>
+        <div class="pc-body">
+          <div class="pc-name">Gladi</div>
+          <div class="pc-role">QC · INKA</div>
+          <div class="pc-note">Susah bangun, tapi ga pernah absen. Itu effort beneran — salut. ⏰</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="wavy"><svg viewBox="0 0 1200 40" preserveAspectRatio="none" height="40"><path d="M0,20 C150,0 350,40 600,20 C850,0 1050,40 1200,20 L1200,40 L0,40 Z" fill="var(--lav)" opacity=".5"/><path d="M0,28 C200,8 400,40 600,22 C800,5 1000,42 1200,22 L1200,40 L0,40 Z" fill="var(--lav2)" opacity=".2"/></svg></div>
+
+  <!-- MSG -->
+  <section class="msg-sec reveal">
+    <div>
+      <div class="slabel">💌 Untuk Zulfa, Yulia, Gladi</div>
+      <h2 class="msg-h2">Makasih udah bikin<br/>magang ini <em>worth it.</em></h2>
+      <div class="msg-prose">
+        <p>Aku kenal kalian dari cerita-cerita Intan tiap malam — dan jujur, dari ceritanya aku bisa bayangin gimana kalian di lapangan. Zulfa yang ga pernah males, Yulia yang entah gimana tetap produktif walau setengah ngantuk, Gladi yang tiap pagi ngelawan alarm tapi tetap nongol juga.</p>
+        <p>Tim yang kayak gitu yang enak. Ga perlu semua serba jago — yang penting saling nutup kekurangan masing-masing.</p>
+        <p>Semoga ilmunya kepake, dan pertemanannya tetap jalan walau magangnya udah kelar! 🙌</p>
+      </div>
+      <div class="msg-from">— Agri. Yang ga ikut, tapi ikut bangga.</div>
+    </div>
+    <div class="notes">
+      <div class="note">
+        <span class="note-tag">🌿 Zulfa</span>
+        <div class="note-text">Yang paling rajin di antara kalian. Tipe orang yang kalau dikasih kerjaan, dikerjain — bukan ditunda. Tipe yang bikin tim enak.</div>
+      </div>
+      <div class="note">
+        <span class="note-tag">💜 Yulia</span>
+        <div class="note-text">Sering ketiduran, tapi tetep kelar juga kerjanya. Ada skill tersembunyi di situ — bisa istirahat di sela chaos tanpa ngorbanin output.</div>
+      </div>
+      <div class="note">
+        <span class="note-tag">🍑 Gladi</span>
+        <div class="note-text">Susah bangun tiap pagi, tapi ga pernah absen. Itu bukan hal kecil — butuh effort beneran buat tetap dateng meski badan minta tidur.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wavy"><svg viewBox="0 0 1200 40" preserveAspectRatio="none" height="40"><path d="M0,20 C150,40 350,0 600,20 C850,40 1050,0 1200,20 L1200,40 L0,40 Z" fill="var(--peach)" opacity=".5"/><path d="M0,15 C200,35 400,5 600,25 C800,45 1000,10 1200,28 L1200,40 L0,40 Z" fill="var(--peach2)" opacity=".2"/></svg></div>
+
+  <!-- INTAN SECTION -->
+  <section class="her-sec reveal">
+    <div>
+      <div class="her-portrait" onclick="upHer()">
+        <div class="her-ph" id="herPh"><span class="ini">IN</span><span class="iname">Intan</span></div>
+        <div class="her-pov"><span>Ganti Foto 📸</span></div>
+        <input type="file" accept="image/*" id="herFile" onchange="handleHer(event)"/>
+      </div>
+      <div class="her-namelabel">Intan ⭐</div>
+    </div>
+    <div class="her-right">
+      <div class="her-badge">✨ Khusus untuk kamu</div>
+      <h2 class="her-h2">Yang paling aku<br/>tunggu <em>ceritanya.</em></h2>
+      <div class="her-prose">
+        <p>Tiap malam kamu pulang magang, aku selalu nanya "gimana tadi?" — dan kamu selalu punya cerita. Tentang kerjaan, tentang tim, tentang hal-hal kecil yang terjadi di sana. Aku dengerin semua itu, dan dari situ aku tau kamu ngejalanin ini dengan serius.</p>
+        <p>Kamu selesain ini dari awal sampai akhir, dan itu sesuatu yang harusnya kamu bangga — walau dari dalam mungkin kerasa biasa aja.</p>
+        <p>Aku tau kamu ga suka yang lebay. Jadi singkat: aku bangga, dan senang kamu udah selesai dengan baik. 🥹</p>
+      </div>
+      <div class="her-callout">
+        <p>Ada pesan khusus buat kamu di tombol paling bawah — buka kalau udah siap ya. 💛</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="wavy"><svg viewBox="0 0 1200 40" preserveAspectRatio="none" height="40"><path d="M0,20 C150,0 350,40 600,20 C850,0 1050,40 1200,20 L1200,40 L0,40 Z" fill="var(--sky2)" opacity=".6"/><path d="M0,28 C200,8 400,40 600,22 C800,5 1000,42 1200,22 L1200,40 L0,40 Z" fill="var(--mint)" opacity=".3"/></svg></div>
+
+  <!-- GALLERY -->
+  <section class="gal reveal">
+    <div class="slabel">📷 Foto-fotonya</div>
+    <h2 class="gal-h2">Momen yang layak<br/>diabadikan! 🎞️</h2>
+    <div class="gal-grid">
+      <div class="gs" onclick="upGal(0)"><div class="gs-ph"><span class="gn">I</span><span class="gt">Hari Pertama</span></div><div class="gs-ov"><span>Unggah 📸</span></div><div class="gs-lbl">Hari Pertama</div><input type="file" accept="image/*" onchange="handleGal(event,0)"/></div>
+      <div class="gs" onclick="upGal(1)"><div class="gs-ph"><span class="gn">II</span><span class="gt">Lagi Kerja</span></div><div class="gs-ov"><span>Unggah 📸</span></div><div class="gs-lbl">Lagi Kerja</div><input type="file" accept="image/*" onchange="handleGal(event,1)"/></div>
+      <div class="gs" onclick="upGal(2)"><div class="gs-ph"><span class="gn">III</span><span class="gt">Tim Bareng</span></div><div class="gs-ov"><span>Unggah 📸</span></div><div class="gs-lbl">Tim Bareng</div><input type="file" accept="image/*" onchange="handleGal(event,2)"/></div>
+      <div class="gs" onclick="upGal(3)"><div class="gs-ph"><span class="gn">IV</span><span class="gt">Makan Siang</span></div><div class="gs-ov"><span>Unggah 📸</span></div><div class="gs-lbl">Makan Siang</div><input type="file" accept="image/*" onchange="handleGal(event,3)"/></div>
+      <div class="gs" onclick="upGal(4)"><div class="gs-ph"><span class="gn">V</span><span class="gt">Kegiatan QC</span></div><div class="gs-ov"><span>Unggah 📸</span></div><div class="gs-lbl">Kegiatan QC</div><input type="file" accept="image/*" onchange="handleGal(event,4)"/></div>
+      <div class="gs" onclick="upGal(5)"><div class="gs-ph"><span class="gn">VI</span><span class="gt">Santai</span></div><div class="gs-ov"><span>Unggah 📸</span></div><div class="gs-lbl">Santai</div><input type="file" accept="image/*" onchange="handleGal(event,5)"/></div>
+      <div class="gs" onclick="upGal(6)"><div class="gs-ph"><span class="gn">VII</span><span class="gt">Ngobrol</span></div><div class="gs-ov"><span>Unggah 📸</span></div><div class="gs-lbl">Ngobrol</div><input type="file" accept="image/*" onchange="handleGal(event,6)"/></div>
+      <div class="gs" onclick="upGal(7)"><div class="gs-ph"><span class="gn">VIII</span><span class="gt">Hari Terakhir</span></div><div class="gs-ov"><span>Unggah 📸</span></div><div class="gs-lbl">Hari Terakhir</div><input type="file" accept="image/*" onchange="handleGal(event,7)"/></div>
+    </div>
+  </section>
+
+  <!-- CLOSER -->
+  <div class="closer reveal">
+    <div class="closer-l">
+      <div class="cl">Dari Agri 🚂</div>
+      <div class="ct">Selamat, <em>kalian!</em> 🎉</div>
+    </div>
+    <button class="btn" id="btnMsg">💌 Pesan untuk Intan</button>
+  </div>
+
+  <footer class="fbar">
+    <span>PT INKA (Persero) · Magang 2024 🚆</span>
+    <span>Dibuat oleh <span class="r">Agri</span> dengan ❤️</span>
+  </footer>
+
+</main>
+
+<!-- MODAL -->
+<div class="mbg" id="modal">
+  <div class="mbox">
+    <button class="mclose" id="mclose">Tutup ✕</button>
+    <div class="m-badge">✨ Untuk Intan · dari Agri</div>
+    <div class="m-title">Buat kamu. 💛</div>
+    <div class="m-body">
+      <p>Aku tau kamu mungkin ga expect ada yang bikin ini. Tapi ya, aku bikin.</p>
+      <p>Bukan karena harus atau ada momen spesial — tapi karena kamu udah ngejalanin sesuatu yang ga gampang, dan aku mau kamu tau aku liat itu.</p>
+      <p>Selamat ya, In. Serius. 🥹</p>
+    </div>
+    <div class="m-from">— Agri.</div>
+  </div>
+</div>
+
+<script>
+/* TIES */
+(function(){
+  const t=document.getElementById('ovTies');
+  for(let i=0;i<36;i++){const d=document.createElement('div');d.className='ov-tie';t.appendChild(d);}
+})();
+
+/* SMOKE */
+let smokeInterval=null;
+function spawnPuff(){
+  const box=document.getElementById('smokeBox');
+  if(!box)return;
+  const p=document.createElement('div');
+  p.className='puff';
+  const sz=10+Math.random()*10;
+  p.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(Math.random()*12)+'px;top:0;animation-duration:'+(0.7+Math.random()*0.4)+'s;animation-delay:0s';
+  box.appendChild(p);
+  setTimeout(()=>p.remove(),1200);
+}
+
+/* OVERLAY DRAG */
+const ov=document.getElementById('overlay');
+const train=document.getElementById('ovTrain');
+const wrap=document.getElementById('ovTrackWrap');
+const mw=document.getElementById('mainWrap');
+let drag=false,sx=0,cx=0,maxD=0,done=false;
+
+smokeInterval=setInterval(spawnPuff,320);
+
+train.addEventListener('pointerdown',e=>{
+  if(done)return;drag=true;sx=e.clientX;cx=0;
+  maxD=wrap.offsetWidth-170;
+  train.setPointerCapture(e.pointerId);
+  train.style.transition='none';e.preventDefault();
+});
+window.addEventListener('pointermove',e=>{
+  if(!drag||done)return;
+  cx=Math.max(0,Math.min(e.clientX-sx,maxD));
+  train.style.left=cx+'px';
+  /* wobble */
+  const prog=cx/maxD;
+  train.style.transform='translateY('+(Math.sin(cx/12)*2)+'px)';
+});
+window.addEventListener('pointerup',()=>{
+  if(!drag||done)return;drag=false;
+  if(cx>maxD*.45){
+    done=true;
+    clearInterval(smokeInterval);
+    /* burst smoke */
+    for(let i=0;i<6;i++)setTimeout(spawnPuff,i*80);
+    train.style.transition='left .6s cubic-bezier(.4,0,.2,1)';
+    train.style.left=(wrap.offsetWidth+80)+'px';
+    setTimeout(()=>{
+      ov.classList.add('gone');
+      mw.style.opacity='1';
+      setTimeout(()=>conf(80),400);
+    },640);
+  }else{
+    train.style.transition='left .4s cubic-bezier(.34,1.56,.64,1)';
+    train.style.left='0px';cx=0;
+    train.style.transform='';
+  }
+});
+
+/* UPLOAD TEAM */
+function up(i){document.querySelector('.pc-photo[data-idx="'+i+'"] input').click()}
+function handleUp(e,i){
+  const f=e.target.files[0];if(!f)return;
+  if(!f.type.startsWith('image/')){alert('Hanya file gambar ya! 📸');return;}
+  if(f.size>10*1024*1024){alert('Ukuran max 10MB ya!');return;}
+  const r=new FileReader();
+  r.onload=ev=>{
+    const ph=document.querySelector('.pc-photo[data-idx="'+i+'"] .pc-ph');
+    const photo=document.querySelector('.pc-photo[data-idx="'+i+'"]');
+    let img=photo.querySelector('img');
+    if(!img){img=document.createElement('img');photo.prepend(img);}
+    img.src=ev.target.result;
+    if(ph)ph.style.display='none';
+    try{localStorage.setItem('foto_team_'+i,ev.target.result);}catch(err){}
+  };
+  r.readAsDataURL(f);e.target.value='';
+}
+
+/* UPLOAD INTAN */
+function upHer(){document.getElementById('herFile').click()}
+function handleHer(e){
+  const f=e.target.files[0];if(!f)return;
+  if(!f.type.startsWith('image/')){alert('Hanya file gambar ya! 📸');return;}
+  if(f.size>10*1024*1024){alert('Ukuran max 10MB ya!');return;}
+  const r=new FileReader();
+  r.onload=ev=>{
+    const p=document.querySelector('.her-portrait');
+    const ph=document.getElementById('herPh');
+    let img=p.querySelector('img');
+    if(!img){img=document.createElement('img');p.prepend(img);}
+    img.src=ev.target.result;
+    if(ph)ph.style.display='none';
+    try{localStorage.setItem('foto_her',ev.target.result);}catch(err){}
+  };r.readAsDataURL(f);e.target.value='';
+}
+
+/* UPLOAD GALLERY */
+function upGal(i){document.querySelectorAll('.gs')[i].querySelector('input').click()}
+function handleGal(e,i){
+  const f=e.target.files[0];if(!f)return;
+  if(!f.type.startsWith('image/')){alert('Hanya file gambar ya! 📸');return;}
+  const r=new FileReader();
+  r.onload=ev=>{
+    const s=document.querySelectorAll('.gs')[i];
+    const ph=s.querySelector('.gs-ph');
+    let img=s.querySelector('img');
+    if(!img){img=document.createElement('img');s.prepend(img);}
+    img.src=ev.target.result;
+    if(ph)ph.style.display='none';
+    try{localStorage.setItem('foto_gal_'+i,ev.target.result);}catch(err){}
+  };r.readAsDataURL(f);e.target.value='';
+}
+
+/* RESTORE */
+window.addEventListener('DOMContentLoaded',()=>{
+  for(let i=0;i<4;i++){
+    const s=localStorage.getItem('foto_team_'+i);
+    if(s){
+      const ph=document.querySelector('.pc-photo[data-idx="'+i+'"] .pc-ph');
+      const photo=document.querySelector('.pc-photo[data-idx="'+i+'"]');
+      if(photo){let img=photo.querySelector('img');if(!img){img=document.createElement('img');photo.prepend(img);}img.src=s;if(ph)ph.style.display='none';}
+    }
+  }
+  const sh=localStorage.getItem('foto_her');
+  if(sh){const p=document.querySelector('.her-portrait');const ph=document.getElementById('herPh');let img=p.querySelector('img');if(!img){img=document.createElement('img');p.prepend(img);}img.src=sh;if(ph)ph.style.display='none';}
+  for(let i=0;i<8;i++){
+    const s=localStorage.getItem('foto_gal_'+i);
+    if(s){const el=document.querySelectorAll('.gs')[i];if(el){const ph=el.querySelector('.gs-ph');let img=el.querySelector('img');if(!img){img=document.createElement('img');el.prepend(img);}img.src=s;if(ph)ph.style.display='none';}}
+  }
+});
+
+/* MODAL */
+document.getElementById('btnMsg').onclick=()=>{document.getElementById('modal').classList.add('open');conf(60)};
+document.getElementById('mclose').onclick=()=>document.getElementById('modal').classList.remove('open');
+document.getElementById('modal').onclick=e=>{if(e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('open')};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('modal').classList.remove('open')});
+
+/* CONFETTI */
+function conf(n){
+  const cols=['#FF4B6E','#FFD93D','#6EDBA8','#A78BFA','#FF9E7D','#C9E8F7'];
+  const shapes=['●','■','▲','★','♦'];
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');d.className='conf';
+    d.style.left=Math.random()*100+'%';d.style.top='-10px';
+    const sz=6+Math.random()*8;
+    d.style.width=sz+'px';d.style.height=sz+'px';
+    d.style.background=cols[Math.floor(Math.random()*cols.length)];
+    d.style.borderRadius=Math.random()>.5?'50%':'2px';
+    d.style.animationDuration=(1.8+Math.random()*1.6)+'s';
+    d.style.animationDelay=(Math.random()*.5)+'s';
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),4500);
+  }
+}
+
+/* REVEAL */
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target)}});
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
